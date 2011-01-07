@@ -12,9 +12,9 @@ SnapBackup is still very much alpha software, but it has been in use in producti
 
 By default, SnapBackup is configured to use Amazon's S3 service as it's configured storage connector. The connector uses the following ENV variables for it's configuration:
 
- * BUCKET_NAME
- * AWS_SECRET
- * AWS_PUBLIC
+ * S3\_BUCKET\_NAME
+ * AMAZON\_ACCESS\_KEY\_ID
+ * AMAZON\_SECRET\_ACCESS\_KEY
  
 When running the backup script, be sure to make sure that those variables are visible at the time of execution.
 
