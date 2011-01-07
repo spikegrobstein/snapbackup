@@ -7,12 +7,17 @@
 ## files are then fed to the upload.rb script which puts them in the right place(s) on S3
 ####
 
+## User configuration:
+STORAGE_CONNECTOR_NAME="aws_s3.rb"
+
+
+#######################################################################################################
+
 SCRIPT=$(readlink -f $0)
 echo $SCRIPT
 SCRIPTPATH=`dirname "$SCRIPT"`
 
-STORAGE_CONNECTOR="$SCRIPTPATH/aws_s3.rb"
-
+STORAGE_CONNECTOR="${SCRIPTPATH}/${STORAGE_CONNECTOR_NAME}"
 DATESTAMP=`date +%Y_%m%d`
 
 # processes lines of input on STDIN and sends it to the upload script
@@ -26,6 +31,13 @@ function store_files () {
 			break
 		fi
 	
+		# StorageConnectors must adhere to the following commandline usage:
+		# ./connector.py <datestamp> <policy_name> <file_path>
+		#
+		# The connector will then store that file and return 0 (success)
+		# a non-zero return value signals and error.
+		# TODO: catch errors from the StorageConnector
+		
 		"$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
 	done
 }
