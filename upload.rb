@@ -19,11 +19,11 @@ hostname = `hostname`.chomp
 remote_path = "/#{datestamp}/#{hostname}/#{policy_name}/#{filename}"
 
 # debugging information:
-puts "bucket_name: #{bucket_name}"
-puts "datestamp: #{datestamp}"
-puts "policy_name: #{policy_name}"
-puts "filepath: #{filepath}"
-puts "remote_path: #{remote_path}\n"
+STDERR.puts "bucket_name: #{bucket_name}"
+STDERR.puts "datestamp: #{datestamp}"
+STDERR.puts "policy_name: #{policy_name}"
+STDERR.puts "filepath: #{filepath}"
+STDERR.puts "remote_path: #{remote_path}\n"
 
 # make connection:
 AWS::S3::Base.establish_connection!(
