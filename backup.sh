@@ -17,7 +17,7 @@ SCRIPT=$(readlink -f $0)
 echo $SCRIPT
 SCRIPTPATH=`dirname "$SCRIPT"`
 
-STORAGE_CONNECTOR="${SCRIPTPATH}/${STORAGE_CONNECTOR_NAME}"
+STORAGE_CONNECTOR="${SCRIPTPATH}/connectors/${STORAGE_CONNECTOR_NAME}"
 DATESTAMP=`date +%Y_%m%d`
 
 # processes lines of input on STDIN and sends it to the upload script
@@ -38,7 +38,7 @@ function store_files () {
 		# a non-zero return value signals and error.
 		# TODO: catch errors from the StorageConnector
 		
-		"$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
+		echo "$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
 	done
 }
 
@@ -47,7 +47,18 @@ function store_files () {
 #export AMAZON_ACCESS_KEY_ID="<<<accesskeyid>>>"
 #export AMAZON_SECRET_ACCESS_KEY="<<<secretaccesskey>>>"
 
-for policy in `ls "$SCRIPTPATH/policies"`
+POLICIES=`ls "$SCRIPTPATH/policies"`
+
+# check to make sure there is at least one policy loaded
+if [[ -z $POLICIES ]]; then
+	echo "No policies were found. Cannot continue the backup."
+	echo "Sample policies are located in the policies-available directory"
+	echo "Symlink polices from policies-available to policies to enable them."
+	echo ""
+	exit 1
+fi
+
+for policy in $POLICIES
 do
 	# parse out the policy name from the filename ( ie: "mysql.sh" => "mysql" )
 	POLICY_NAME=`echo $policy | cut -d'.' -f1`
