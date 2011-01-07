@@ -21,6 +21,7 @@ function store_files () {
 	do
 		read FILE
 	
+		# if the read returned non-zero and it also read no data, then break out of while loop. we're done.
 		if [[ $? -ne 0 && -z $FILE ]]; then
 			break
 		fi
