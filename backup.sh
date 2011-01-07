@@ -15,6 +15,20 @@ UPLOAD_SCRIPT="$SCRIPTPATH/upload.rb"
 
 DATESTAMP=`date +%Y_%m%d`
 
+# processes lines of input on STDIN and sends it to the upload script
+function store_files () {
+	while [[ $? -eq 0 ]]
+	do
+		read FILE
+	
+		if [[ $? -ne 0 && -z $FILE ]]; then
+			break
+		fi
+	
+		"$UPLOAD_SCRIPT" $DATESTAMP $POLICY_NAME $FILE
+	done
+}
+
 # AWS Shit:
 #export S3_BUCKET_NAME="<<<bucketname>>>"
 #export AMAZON_ACCESS_KEY_ID="<<<accesskeyid>>>"
@@ -22,23 +36,9 @@ DATESTAMP=`date +%Y_%m%d`
 
 for policy in `ls "$SCRIPTPATH/policies"`
 do
-	# run policy as:
-	# $policy DATESTAMP BUCKET_NAME ACCESS_KEY_ID SECRET_ACCESS_KEY
-	
 	# parse out the policy name from the filename ( ie: "mysql.sh" => "mysql" )
 	POLICY_NAME=`echo $policy | cut -d'.' -f1`
 	
 	# execute the policy and receive list of files ready for backup.
-	FILES=`"$SCRIPTPATH/policies/$policy"`
-	
-	# iterate over the files and upload each to S3
-	for file in $FILES
-	do
-		# call the upload script like:
-		# upload.rb DATESTAMP POLICY FILE
-		"$UPLOAD_SCRIPT" $DATESTAMP $POLICY_NAME $file
-		if [[ -e $file ]]; then
-		  rm $file
-		fi
-	done
+	${SCRIPTPATH}/policies/${policy} | store_files
 done
