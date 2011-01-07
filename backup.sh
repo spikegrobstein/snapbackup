@@ -15,9 +15,6 @@ UPLOAD_SCRIPT="$SCRIPTPATH/upload.rb"
 
 DATESTAMP=`date +%Y_%m%d`
 
-echo $SCRIPTPATH
-exit
-
 # AWS Shit:
 #export S3_BUCKET_NAME="<<<bucketname>>>"
 #export AMAZON_ACCESS_KEY_ID="<<<accesskeyid>>>"
@@ -28,7 +25,10 @@ do
 	# run policy as:
 	# $policy DATESTAMP BUCKET_NAME ACCESS_KEY_ID SECRET_ACCESS_KEY
 	
+	# parse out the policy name from the filename ( ie: "mysql.sh" => "mysql" )
 	POLICY_NAME=`echo $policy | cut -d'.' -f1`
+	
+	# execute the policy and receive list of files ready for backup.
 	FILES=`"$SCRIPTPATH/policies/$policy"`
 	
 	# iterate over the files and upload each to S3
