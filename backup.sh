@@ -38,7 +38,7 @@ function store_files () {
 		# a non-zero return value signals and error.
 		# TODO: catch errors from the StorageConnector
 		
-		echo "$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
+		"$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
 	done
 }
 
