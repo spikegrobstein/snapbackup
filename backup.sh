@@ -11,7 +11,7 @@ SCRIPT=$(readlink -f $0)
 echo $SCRIPT
 SCRIPTPATH=`dirname "$SCRIPT"`
 
-UPLOAD_SCRIPT="$SCRIPTPATH/upload.rb"
+STORAGE_CONNECTOR="$SCRIPTPATH/aws_s3.rb"
 
 DATESTAMP=`date +%Y_%m%d`
 
@@ -26,7 +26,7 @@ function store_files () {
 			break
 		fi
 	
-		"$UPLOAD_SCRIPT" $DATESTAMP $POLICY_NAME $FILE
+		"$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
 	done
 }
 
