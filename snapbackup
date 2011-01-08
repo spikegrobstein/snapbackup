@@ -10,6 +10,11 @@
 ## User configuration:
 STORAGE_CONNECTOR_NAME="aws_s3.rb"
 
+# AWS Shit:
+export S3_BUCKET_NAME="<<<bucketname>>>"
+export AMAZON_ACCESS_KEY_ID="<<<accesskeyid>>>"
+export AMAZON_SECRET_ACCESS_KEY="<<<secretaccesskey>>>"
+
 
 #######################################################################################################
 
@@ -39,13 +44,13 @@ function store_files () {
 		# TODO: catch errors from the StorageConnector
 		
 		"$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
+		
+		# delete the file after it's uploaded
+		if [[ -e $FILE ]];
+			rm $FILE
+		fi
 	done
 }
-
-# AWS Shit:
-#export S3_BUCKET_NAME="<<<bucketname>>>"
-#export AMAZON_ACCESS_KEY_ID="<<<accesskeyid>>>"
-#export AMAZON_SECRET_ACCESS_KEY="<<<secretaccesskey>>>"
 
 POLICIES=`ls "$SCRIPTPATH/policies"`
 
