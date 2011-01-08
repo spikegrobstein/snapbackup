@@ -46,7 +46,7 @@ function store_files () {
 		"$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
 		
 		# delete the file after it's uploaded
-		if [[ -e $FILE ]];
+		if [[ -e "$FILE" ]]; then
 			rm $FILE
 		fi
 	done
