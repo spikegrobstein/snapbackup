@@ -25,6 +25,20 @@ SCRIPTPATH=`dirname "$SCRIPT"`
 STORAGE_CONNECTOR="${SCRIPTPATH}/connectors/${STORAGE_CONNECTOR_NAME}"
 DATESTAMP=`date +%Y_%m%d`
 
+# exit codes
+EXIT_NOERR=0
+EXIT_NOPOLICIES=10
+EXIT_PARTIALERROR=11
+EXIT_GENERICERROR=1
+
+# a counter for number of errors encountered
+ENCOUNTERED_ERRORS=0
+
+function increment_errors () {
+	ENCOUNTERED_ERRORS=$(($ENCOUNTERED_ERRORS + 1))
+}
+
+
 # processes lines of input on STDIN and sends it to the upload script
 function store_files () {
 	while [[ $? -eq 0 ]]
@@ -43,7 +57,7 @@ function store_files () {
 		# a non-zero return value signals and error.
 		# TODO: catch errors from the StorageConnector
 		
-		"$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
+		echo "$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
 		
 		# delete the file after it's uploaded
 		if [[ -e "$FILE" ]]; then
@@ -58,6 +72,7 @@ function run_policy () {
 	
 	if [[ ! -e $POLICY ]]; then
 		echo "Policy not found: $POLICY"
+		increment_errors
 	else
 		$POLICY | store_files
 	fi
@@ -98,7 +113,7 @@ function run_all_policies () {
 		echo "Sample policies are located in the policies-available directory"
 		echo "Symlink polices from policies-available to policies to enable them."
 		echo ""
-		exit 1
+		exit $ERROR_NOPOLICIES
 	fi
 
 	for policy in $POLICIES
@@ -125,4 +140,10 @@ else
 	done
 fi
 
+# check number of errors encountered
+if [[ $ENCOUNTERED_ERRORS -gt 0 ]]; then
+	echo "Encountered $ENCOUNTERED_ERRORS errors."
+	echo ""
+	exit $ERROR_PARTIALERROR
+fi
 
