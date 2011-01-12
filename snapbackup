@@ -52,6 +52,41 @@ function store_files () {
 	done
 }
 
+# run specified policy
+function run_policy () {
+	POLICY=$(policy_abs_path $1)
+	
+	$POLICY | store_files
+}
+
+# given a string representing a policy, returns the abolute path to the policy
+# absolute path is calculated by checking to see if supplied string contains a leading slash
+# if leading slash, then return that string
+# else, append supplied string to path to policies directory
+# ie:
+#  "/path/to/policy.sh" => "/path/to/policy.sh"
+#  "subdir/policy.sh" 	=> "/usr/local/snapbackup/policies/subdir/policy.sh"
+#  "policy.sh" 					=> "/usr/local/snapbackup/policies/policy.sh"
+#
+# @param $POLICY -- the afformentioned policy
+function policy_abs_path () {
+	POLICY=$1
+	
+	PTMP=${POLICY#/}
+	
+	# check to see if the policy is an absolute path
+	# it's absolute if it starts with a / (if $PTMP != $POLICY)
+	if [[ $POLICY == $PTMP ]]; then
+		# they're equal, so the path to the policy is actually relative to the policies directory
+		POLICY=${SCRIPTPATH}/policies/${POLICY}
+	fi
+	
+	# return the value
+	echo $POLICY
+}
+
+
+
 POLICIES=`ls "$SCRIPTPATH/policies"`
 
 # check to make sure there is at least one policy loaded
@@ -69,5 +104,5 @@ do
 	POLICY_NAME=`echo $policy | cut -d'.' -f1`
 	
 	# execute the policy and receive list of files ready for backup.
-	${SCRIPTPATH}/policies/${policy} | store_files
+	run_policy $policy
 done
