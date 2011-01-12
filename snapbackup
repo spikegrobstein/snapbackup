@@ -147,3 +147,7 @@ if [[ $ENCOUNTERED_ERRORS -gt 0 ]]; then
 	exit $ERROR_PARTIALERROR
 fi
 
+exit $ERROR_NOERR
+
+#done.
+
