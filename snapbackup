@@ -56,7 +56,11 @@ function store_files () {
 function run_policy () {
 	POLICY=$(policy_abs_path $1)
 	
-	$POLICY | store_files
+	if [[ ! -e $POLICY ]]; then
+		echo "Policy not found: $POLICY"
+	else
+		$POLICY | store_files
+	fi
 }
 
 # given a string representing a policy, returns the abolute path to the policy
