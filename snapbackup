@@ -1,7 +1,7 @@
 #! /bin/bash
 
 ####
-## backup.sh
+## snapbackup
 ## run this to iterate over scripts in the policies directory
 ## each policy file echos back the files that it created whne it's done
 ## files are then fed to the upload.rb script which puts them in the right place(s) on S3
