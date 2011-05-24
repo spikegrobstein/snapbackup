@@ -46,7 +46,7 @@ function store_files () {
 		read FILE
 	
 		# if the read returned non-zero and it also read no data, then break out of while loop. we're done.
-		if [[ $? -ne 0 && -z $FILE ]]; then
+		if [[ $? -ne 0 && -z "$FILE" ]]; then
 			break
 		fi
 	
@@ -57,7 +57,7 @@ function store_files () {
 		# a non-zero return value signals and error.
 		# TODO: catch errors from the StorageConnector
 		
-		echo "$STORAGE_CONNECTOR" $DATESTAMP $POLICY_NAME $FILE
+		"$STORAGE_CONNECTOR" $DATESTAMP "$POLICY_NAME" "$FILE"
 		
 		# delete the file after it's uploaded
 		if [[ -e "$FILE" ]]; then
