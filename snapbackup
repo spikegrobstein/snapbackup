@@ -118,7 +118,7 @@ function run_all_policies () {
 
 	for policy in $POLICIES
 	do
-		# parse out the policy name from the filename ( ie: "mysql.sh" => "mysql" )
+		# parse out the policy name from the filename ( eg: "mysql.sh" => "mysql" )
 		POLICY_NAME=`echo $policy | cut -d'.' -f1`
 
 		# execute the policy and receive list of files ready for backup.
