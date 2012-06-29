@@ -27,9 +27,9 @@ STDERR.puts "remote_path: #{remote_path}\n"
 
 # make connection:
 AWS::S3::Base.establish_connection!(
-    :access_key_id     => aws_account_id,
-    :secret_access_key => aws_secret_key
-  )
+  :access_key_id     => aws_account_id,
+  :secret_access_key => aws_secret_key
+)
 
 # THE BUCKET BETTER FUCKING EXIST!
 # make sure the bucket exists

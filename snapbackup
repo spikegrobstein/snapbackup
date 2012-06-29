@@ -35,47 +35,47 @@ EXIT_GENERICERROR=1
 ENCOUNTERED_ERRORS=0
 
 function increment_errors () {
-	ENCOUNTERED_ERRORS=$(($ENCOUNTERED_ERRORS + 1))
+  ENCOUNTERED_ERRORS=$(($ENCOUNTERED_ERRORS + 1))
 }
 
 
 # processes lines of input on STDIN and sends it to the upload script
 function store_files () {
-	while [[ $? -eq 0 ]]
-	do
-		read FILE
-	
-		# if the read returned non-zero and it also read no data, then break out of while loop. we're done.
-		if [[ $? -ne 0 && -z "$FILE" ]]; then
-			break
-		fi
-	
-		# StorageConnectors must adhere to the following commandline usage:
-		# ./connector.py <datestamp> <policy_name> <file_path>
-		#
-		# The connector will then store that file and return 0 (success)
-		# a non-zero return value signals and error.
-		# TODO: catch errors from the StorageConnector
-		
-		"$STORAGE_CONNECTOR" $DATESTAMP "$POLICY_NAME" "$FILE"
-		
-		# delete the file after it's uploaded
-		if [[ -e "$FILE" ]]; then
-			rm $FILE
-		fi
-	done
+  while [[ $? -eq 0 ]]
+  do
+    read FILE
+  
+    # if the read returned non-zero and it also read no data, then break out of while loop. we're done.
+    if [[ $? -ne 0 && -z "$FILE" ]]; then
+      break
+    fi
+  
+    # StorageConnectors must adhere to the following commandline usage:
+    # ./connector.py <datestamp> <policy_name> <file_path>
+    #
+    # The connector will then store that file and return 0 (success)
+    # a non-zero return value signals and error.
+    # TODO: catch errors from the StorageConnector
+    
+    "$STORAGE_CONNECTOR" $DATESTAMP "$POLICY_NAME" "$FILE"
+    
+    # delete the file after it's uploaded
+    if [[ -e "$FILE" ]]; then
+      rm $FILE
+    fi
+  done
 }
 
 # run specified policy
 function run_policy () {
-	POLICY=$(policy_abs_path $1)
-	
-	if [[ ! -e $POLICY ]]; then
-		echo "Policy not found: $POLICY"
-		increment_errors
-	else
-		$POLICY | store_files
-	fi
+  POLICY=$(policy_abs_path $1)
+  
+  if [[ ! -e $POLICY ]]; then
+    echo "Policy not found: $POLICY"
+    increment_errors
+  else
+    $POLICY | store_files
+  fi
 }
 
 # given a string representing a policy, returns the abolute path to the policy
@@ -84,46 +84,46 @@ function run_policy () {
 # else, append supplied string to path to policies directory
 # ie:
 #  "/path/to/policy.sh" => "/path/to/policy.sh"
-#  "subdir/policy.sh" 	=> "/usr/local/snapbackup/policies/subdir/policy.sh"
-#  "policy.sh" 					=> "/usr/local/snapbackup/policies/policy.sh"
+#  "subdir/policy.sh"   => "/usr/local/snapbackup/policies/subdir/policy.sh"
+#  "policy.sh"           => "/usr/local/snapbackup/policies/policy.sh"
 #
 # @param $POLICY -- the afformentioned policy
 function policy_abs_path () {
-	POLICY=$1
-	
-	PTMP=${POLICY#/}
-	
-	# check to see if the policy is an absolute path
-	# it's absolute if it starts with a / (if $PTMP != $POLICY)
-	if [[ $POLICY == $PTMP ]]; then
-		# they're equal, so the path to the policy is actually relative to the policies directory
-		POLICY=${SCRIPTPATH}/policies/${POLICY}
-	fi
-	
-	# return the value
-	echo $POLICY
+  POLICY=$1
+  
+  PTMP=${POLICY#/}
+  
+  # check to see if the policy is an absolute path
+  # it's absolute if it starts with a / (if $PTMP != $POLICY)
+  if [[ $POLICY == $PTMP ]]; then
+    # they're equal, so the path to the policy is actually relative to the policies directory
+    POLICY=${SCRIPTPATH}/policies/${POLICY}
+  fi
+  
+  # return the value
+  echo $POLICY
 }
 
 function run_all_policies () {
-	POLICIES=`ls "$SCRIPTPATH/policies"`
+  POLICIES=`ls "$SCRIPTPATH/policies"`
 
-	# check to make sure there is at least one policy loaded
-	if [[ -z $POLICIES ]]; then
-		echo "No policies were found. Cannot continue the backup."
-		echo "Sample policies are located in the policies-available directory"
-		echo "Symlink polices from policies-available to policies to enable them."
-		echo ""
-		exit $ERROR_NOPOLICIES
-	fi
+  # check to make sure there is at least one policy loaded
+  if [[ -z $POLICIES ]]; then
+    echo "No policies were found. Cannot continue the backup."
+    echo "Sample policies are located in the policies-available directory"
+    echo "Symlink polices from policies-available to policies to enable them."
+    echo ""
+    exit $ERROR_NOPOLICIES
+  fi
 
-	for policy in $POLICIES
-	do
-		# parse out the policy name from the filename ( eg: "mysql.sh" => "mysql" )
-		POLICY_NAME=`echo $policy | cut -d'.' -f1`
+  for policy in $POLICIES
+  do
+    # parse out the policy name from the filename ( eg: "mysql.sh" => "mysql" )
+    POLICY_NAME=`echo $policy | cut -d'.' -f1`
 
-		# execute the policy and receive list of files ready for backup.
-		run_policy $policy
-	done
+    # execute the policy and receive list of files ready for backup.
+    run_policy $policy
+  done
 }
 
 ############################
@@ -133,18 +133,18 @@ function run_all_policies () {
 # if any commandline arguments are supplied, run those policies, otherwise, run all policies
 
 if [[ $# -eq 0 ]]; then
-	run_all_policies
+  run_all_policies
 else
-	for policy in $@; do
-		run_policy $policy
-	done
+  for policy in $@; do
+    run_policy $policy
+  done
 fi
 
 # check number of errors encountered
 if [[ $ENCOUNTERED_ERRORS -gt 0 ]]; then
-	echo "Encountered $ENCOUNTERED_ERRORS errors."
-	echo ""
-	exit $ERROR_PARTIALERROR
+  echo "Encountered $ENCOUNTERED_ERRORS errors."
+  echo ""
+  exit $ERROR_PARTIALERROR
 fi
 
 exit $ERROR_NOERR
