@@ -8,6 +8,8 @@ Because SnapBackup is so modular, it is completely language agnostic and anyone 
 
 SnapBackup is still very much alpha software, but it has been in use in production on several servers that I manage for over a year. Expect things to change.
 
+SnapBackup is only compatible with Linux at this time. OSX support should be coming in the future.
+
 ## Quick Start
 
 By default, SnapBackup is configured to use Amazon's S3 service as it's configured storage connector. The connector uses the following ENV variables for it's configuration:
@@ -15,7 +17,7 @@ By default, SnapBackup is configured to use Amazon's S3 service as it's configur
  * S3\_BUCKET\_NAME
  * AMAZON\_ACCESS\_KEY\_ID
  * AMAZON\_SECRET\_ACCESS\_KEY
- 
+
 When running the backup script, be sure to make sure that those variables are visible at the time of execution.
 
 Once those variables are set up, you must enable policies. At the time of this writing, backup policies are stored in the `policies` directory in the same directory as the `snapbackup` executable. Example policies are stored in the `policies-available` directory. By symlinking policies into the `policies` directory, that enables them.
@@ -23,7 +25,7 @@ Once those variables are set up, you must enable policies. At the time of this w
 To run SnapBackup, execute the following as root:
 
     ./snapbackup
-    
+
 ## About
 
 SnapBackup is written by Spike Grobstein <spikegrobstein@mac.com>  
