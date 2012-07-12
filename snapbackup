@@ -46,21 +46,26 @@ function store_files () {
   while [[ $? -eq 0 ]]
   do
     read FILE
-  
+
     # if the read returned non-zero and it also read no data, then break out of while loop. we're done.
     if [[ $? -ne 0 && -z "$FILE" ]]; then
       break
     fi
-  
+
     # StorageConnectors must adhere to the following commandline usage:
     # ./connector.py <datestamp> <policy_name> <file_path>
     #
     # The connector will then store that file and return 0 (success)
     # a non-zero return value signals and error.
     # TODO: catch errors from the StorageConnector
-    
+
     "$STORAGE_CONNECTOR" $DATESTAMP "$POLICY_NAME" "$FILE"
-    
+
+    local VAL=$?
+    if [[ $VAL -ne 0 ]]; then
+      echo "There was an error with the storage connector. It exited with $VAL while uploading ($FILE)" >&2
+    fi
+
     # delete the file after it's uploaded
     if [[ -e "$FILE" ]]; then
       rm "$FILE"
@@ -71,7 +76,7 @@ function store_files () {
 # run specified policy
 function run_policy () {
   POLICY=$(policy_abs_path $1)
-  
+
   if [[ ! -e "$POLICY" ]]; then
     echo "Policy not found: $POLICY"
     increment_errors
@@ -92,16 +97,16 @@ function run_policy () {
 # @param $POLICY -- the afformentioned policy
 function policy_abs_path () {
   POLICY=$1
-  
+
   PTMP=${POLICY#/}
-  
+
   # check to see if the policy is an absolute path
   # it's absolute if it starts with a / (if $PTMP != $POLICY)
   if [[ "$POLICY" == "$PTMP" ]]; then
     # they're equal, so the path to the policy is actually relative to the policies directory
     POLICY=${SCRIPTPATH}/policies/${POLICY}
   fi
-  
+
   # return the value
   echo "$POLICY"
 }
