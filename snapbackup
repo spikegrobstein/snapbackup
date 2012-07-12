@@ -41,6 +41,8 @@ function increment_errors () {
 
 # processes lines of input on STDIN and sends it to the upload script
 function store_files () {
+  true # run this to ensure that $? is set to 0
+
   while [[ $? -eq 0 ]]
   do
     read FILE
