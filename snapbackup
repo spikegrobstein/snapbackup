@@ -7,20 +7,20 @@
 ## files are then fed to the upload.rb script which puts them in the right place(s) on S3
 ####
 
-## User configuration:
-STORAGE_CONNECTOR_NAME="aws_s3.rb"
+# all user configuration is stored in the config.sh file
 
-# AWS Shit:
-export S3_BUCKET_NAME="<<<bucketname>>>"
-export AMAZON_ACCESS_KEY_ID="<<<accesskeyid>>>"
-export AMAZON_SECRET_ACCESS_KEY="<<<secretaccesskey>>>"
-
-
-#######################################################################################################
 
 SCRIPT=$(readlink -f $0)
 echo $SCRIPT
 SCRIPTPATH=`dirname "$SCRIPT"`
+
+# read the config from the config file:
+. "$SCRIPTPATH"/config.sh
+
+# export the AWS variables so they're visible in the connector:
+export S3_BUCKET_NAME
+export AMAZON_ACCESS_KEY_ID
+export AMAZON_SECRET_ACCESS_KEY
 
 STORAGE_CONNECTOR="${SCRIPTPATH}/connectors/${STORAGE_CONNECTOR_NAME}"
 DATESTAMP=`date +%Y_%m%d`
@@ -75,7 +75,7 @@ function store_files () {
 
 # run specified policy
 function run_policy () {
-  POLICY=$(policy_abs_path $1)
+  local POLICY=$(policy_abs_path $1)
 
   if [[ ! -e "$POLICY" ]]; then
     echo "Policy not found: $POLICY"
@@ -96,9 +96,9 @@ function run_policy () {
 #
 # @param $POLICY -- the afformentioned policy
 function policy_abs_path () {
-  POLICY=$1
+  local POLICY=$1
 
-  PTMP=${POLICY#/}
+  local PTMP=${POLICY#/}
 
   # check to see if the policy is an absolute path
   # it's absolute if it starts with a / (if $PTMP != $POLICY)
@@ -112,7 +112,7 @@ function policy_abs_path () {
 }
 
 function run_all_policies () {
-  POLICIES=`ls "$SCRIPTPATH/policies"`
+  local POLICIES=`ls "$SCRIPTPATH/policies"`
 
   # check to make sure there is at least one policy loaded
   if [[ -z $POLICIES ]]; then
