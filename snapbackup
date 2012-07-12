@@ -63,7 +63,7 @@ function store_files () {
     
     # delete the file after it's uploaded
     if [[ -e "$FILE" ]]; then
-      rm $FILE
+      rm "$FILE"
     fi
   done
 }
@@ -72,11 +72,11 @@ function store_files () {
 function run_policy () {
   POLICY=$(policy_abs_path $1)
   
-  if [[ ! -e $POLICY ]]; then
+  if [[ ! -e "$POLICY" ]]; then
     echo "Policy not found: $POLICY"
     increment_errors
   else
-    $POLICY | store_files
+    "$POLICY" | store_files
   fi
 }
 
@@ -97,13 +97,13 @@ function policy_abs_path () {
   
   # check to see if the policy is an absolute path
   # it's absolute if it starts with a / (if $PTMP != $POLICY)
-  if [[ $POLICY == $PTMP ]]; then
+  if [[ "$POLICY" == "$PTMP" ]]; then
     # they're equal, so the path to the policy is actually relative to the policies directory
     POLICY=${SCRIPTPATH}/policies/${POLICY}
   fi
   
   # return the value
-  echo $POLICY
+  echo "$POLICY"
 }
 
 function run_all_policies () {
@@ -138,7 +138,7 @@ if [[ $# -eq 0 ]]; then
   run_all_policies
 else
   for policy in $@; do
-    run_policy $policy
+    run_policy "$policy"
   done
 fi
 
