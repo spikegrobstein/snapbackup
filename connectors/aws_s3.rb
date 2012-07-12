@@ -13,6 +13,8 @@ aws_secret_key = ENV['AMAZON_SECRET_ACCESS_KEY']
 datestamp = ARGV[0]
 policy_name = ARGV[1]
 filepath = ARGV[2]
+
+# TODO: sanity checks. print usage if the above doesn't work out.
 filename = File.basename(filepath)
 hostname = `hostname`.chomp
 
@@ -31,10 +33,13 @@ AWS::S3::Base.establish_connection!(
   :secret_access_key => aws_secret_key
 )
 
-# THE BUCKET BETTER FUCKING EXIST!
-# make sure the bucket exists
-#AWS::S3::Bucket.create(bucket_name)
-
 # upload file to the bucket
-AWS::S3::S3Object.store(remote_path, open(filepath), bucket_name)
+begin
+  AWS::S3::S3Object.store(remote_path, open(filepath), bucket_name)
+rescue AWS::S3::NoSuchBucket
+  # THE BUCKET BETTER FUCKING EXIST!
+  # make sure the bucket exists
+  AWS::S3::Bucket.create(bucket_name)
+  retry
+end
 
