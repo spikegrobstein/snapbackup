@@ -1,4 +1,4 @@
-Set this 
+#Set this 
 
 STORAGE_CONNECTOR_NAME="aws_s3.rb"
 
